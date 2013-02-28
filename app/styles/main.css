@@ -3,6 +3,11 @@
 	/*margin-top:100px;*/
 	background-color: black;
 	font-family: Helvetica,arial;
+	color:#333;
+
+}
+a{
+	text-decoration: none;
 }
 
 #center-wrapper{
@@ -24,21 +29,24 @@
 	padding:0;
 	margin: 0;
 }
-.feed li{
+.feed li.tweet{
 	z-index: 0;
 	list-style: none;
 	/*padding:10px;*/
-	height:50px;
+	
+	min-height:75px;
 	position:relative;
 	border-bottom: solid 1px black;
 	background-color: white;
 	word-break: break-word;
+	padding: 12px 12px 10px 69px;
 }
 
-.feed li:hover{
-	background-color:#999;
+.feed li.tweet:hover{
+	/*background-color:#999;*/
 	/*color:white;*/
 }
+
 #form-wrapper{
 	z-index: 100;
 	position:relative;
@@ -51,14 +59,102 @@
 }
 
 .new-li{
-	margin-top:-50px;
 	position:relative;
 	/*height of gap*/
 	top:-22px;
+	/*height of li element*/
+	margin-top:-75px;
 	background-color: red !important;
 }
 
 
+.header{
+	position:relative;
+}
+.avatar{
+	position: absolute;
+	top: 0;
+	left: -57px;
+	width: 48px;
+	height: 48px;
+	background: #fff;
+	border-radius: 4px;
+}
+
+.full-name{
+	color:#333;
+	font-weight: bold;
+	font-size: 14px;
+}
+.full-name:hover{
+	text-decoration: underline;
+}
+.nickname{
+	font-size: 12px;
+	color:#999;
+}
+.content{
+	font-size: 14px
+}
+.date-time{
+	position: relative;
+	z-index: 50;
+	float: right;
+	margin-top: 2px;
+	font-size: 12px;
+	color:#999;
+}
+
+.detail-expander{
+	font-size: 12px
+}
+.detail-content{
+	font-size: 12px
+}
+
+.footer{
+	min-height: 16px;
+	margin-top: 2px;
+	overflow: hidden;
+	border-top: 1px solid transparent;
+
+}
+.tweet-actions{
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	background: #fff;
+
+}
+.tweet-actions li{
+	float:left;
+}
+.tweet-actions a i{
+	margin: 1px 0 0 8px;
+	overflow: hidden;
+}
+
+.ic-reply{
+	width: 19px;
+	height: 15px;
+	background-position: 0 -87px;
+	background-color:#999;
+}
+.ic-mask{
+	display: inline-block;
+	vertical-align: middle;
+	/*background: transparent url(../images/sprite.png) no-repeat 0 0;*/
+	background-image: url('../images/twitter_icons.png');
+	background-size: 177px 191px;
+}
+
+.ic-mask:hover{
+	background-color:red;
+}
+
+
+
+/*animations*/
 .feed li {
 	-webkit-transition: all 500ms cubic-bezier(0.480, 0.220, 0.325, 1); /* older webkit */
 	-webkit-transition: all 500ms cubic-bezier(0.480, 0.220, 0.325, 1.400); 
@@ -66,16 +162,8 @@
 	    -ms-transition: all 500ms cubic-bezier(0.480, 0.220, 0.325, 1.400); 
 	     -o-transition: all 500ms cubic-bezier(0.480, 0.220, 0.325, 1.400); 
 	        transition: all 500ms cubic-bezier(0.480, 0.220, 0.325, 1.400); /* custom */
-/*.feed li {
-  -webkit-transition-duration: 0.4s;
-     -moz-transition-duration: 0.4s;
-      -ms-transition-duration: 0.4s;
-       -o-transition-duration: 0.4s;
-          transition-duration: 0.4s;
-
-}*/
+}
 .feed li:hover {
-
   -webkit-transition-duration: 0.2s;
      -moz-transition-duration: 0.2s;
       -ms-transition-duration: 0.2s;

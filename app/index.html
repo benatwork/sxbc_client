@@ -27,6 +27,35 @@
             </div>
         </div>
 
+       
+        <script id="entry-template" type="text/x-handlebars-template">
+            <li class="new-li tweet">
+                <time pubdate class='date-time'>{{dateTime}}</time>
+                <div class='header' >
+                    <a class='profile' target='_blank' href='{{userUrl}}'>
+                        <img class='avatar' src="{{userImg}}" />
+                        <span class='full-name'>{{fullName}}</span>
+                        <span class='nickname'>{{nickname}}</span>
+                    </a>
+                </div>
+                <div class='content'>
+                    <p>{{{message}}}</p>
+                    <div class='detail-expander'>
+                        <div class='detail-content'>
+                        </div>
+                    </div>
+                </div>
+                <div class='footer'>
+                    <ul class='tweet-actions'>
+                        
+                        <li><a href="https://twitter.com/intent/tweet?in_reply_to=306736863761293312" class="reply-action web-intent" title="Reply">
+                            <i class="ic-reply ic-mask"></i></a></li>
+                        </li>
+                    </ul>
+                </div>
+
+            </li>
+        </script>
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
@@ -41,6 +70,7 @@
 
         <!-- build:js scripts/main.js -->
         <script src="components/jquery/jquery.js"></script>
+        <script src="components/handlebars/handlebars.js"></script>
         <script src="scripts/main.js"></script>
         <!-- endbuild -->
 </body>

@@ -3,8 +3,8 @@
 /*global Handlebars:false */
 var twitter_user = "canttweetthis_";
 
-var monthNames = [ "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December" ];
+var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
+    "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
 $(document).ready(function() {
 	var inputField = $('#message-input');
 
@@ -12,8 +12,8 @@ $(document).ready(function() {
 		var message = {text:inputField.val()};
 		addMessage(message);
 		inputField.val('');
-
 	});
+
 
 
 	function initTweets(){
@@ -44,16 +44,37 @@ $(document).ready(function() {
 			fullName: message.from_user_name,
 			nickname: '@'+message.from_user,
 			dateTime: monthNames[date.getMonth()]+' '+date.getDay()
-
 		};
 		var newLi    = $.parseHTML(template(context));
 		var $newLi = $(newLi);
 		$newLi.prependTo($('.feed'));
+		$newLi.addClass('with-expansion');
+		$newLi.hover(function(){
+			$('.tweet-actions',this).fadeIn('fast');
+		},function(){
+			$('.tweet-actions',this).fadeOut('fast');
+		});
+		$newLi.click(function(){
+			if($('.footer',this).hasClass('expanded')){
+				$('.footer',this).removeClass('expanded');
+				$('.expand',this).text('expand');
+			} else {
+				$('.footer',this).addClass('expanded');
+				$('.expand',this).text('collapse');
+
+			}
+		});
 
 		setTimeout(function () {
 			$newLi.removeClass('new-li');
 		},0);
 	}
+
+
+
+
+
+
 
 
 	/**

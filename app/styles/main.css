@@ -4,12 +4,16 @@
 	background-color: black;
 	font-family: Helvetica,arial;
 	color:#333;
+	font:normal normal normal 12px/16px "Helvetica Neue",Arial,sans-serif;
+	font-family: 'Helvetica Neue', Arial, sans-serif;
 
 }
 a{
 	text-decoration: none;
 }
-
+strong{
+	color:black;
+}
 #center-wrapper{
 	margin-left:auto;
 	margin-right:auto;
@@ -47,13 +51,17 @@ a{
 	/*color:white;*/
 }
 
+.tweet.with-expansion {
+	cursor: pointer;
+}
+
 #form-wrapper{
 	z-index: 100;
 	position:relative;
 }
 #message-input{
 	width:100%;
-	height:50px;
+	height:75px;
 	padding:0;
 	margin:0;
 }
@@ -61,7 +69,7 @@ a{
 .new-li{
 	position:relative;
 	/*height of gap*/
-	top:-22px;
+	top:-50px;
 	/*height of li element*/
 	margin-top:-75px;
 	background-color: red !important;
@@ -115,43 +123,87 @@ a{
 .footer{
 	min-height: 16px;
 	margin-top: 2px;
+
 	overflow: hidden;
 	border-top: 1px solid transparent;
 
 }
+
+.expanded.footer{
+	padding-top: 10px;
+	margin-top: 10px;
+	border-color: #e8e8e8;
+	border-color: rgba(0,0,0,0.1);
+}
 .tweet-actions{
 	position: absolute;
-	right: 0;
-	bottom: 0;
+	right: 10px;
+	/*bottom: 0;*/
 	background: #fff;
+	list-style: none;
+	display:none;	
 
 }
+
 .tweet-actions li{
 	float:left;
 }
+
 .tweet-actions a i{
 	margin: 1px 0 0 8px;
 	overflow: hidden;
 }
 
-.ic-reply{
-	width: 19px;
-	height: 15px;
-	background-position: 0 -87px;
-	background-color:#999;
-}
 .ic-mask{
 	display: inline-block;
 	vertical-align: middle;
 	/*background: transparent url(../images/sprite.png) no-repeat 0 0;*/
 	background-image: url('../images/twitter_icons.png');
 	background-size: 177px 191px;
+	background-color:#999;
 }
+.ic-reply{
+	width: 19px;
+	height: 15px;
+	background-position: 0 -87px;
+	
+}
+.ic-retweet{
+	width: 22px;
+	height: 15px;
+	background-position: -31px -87px;
+}
+.ic-fav{
+	width: 16px;
+	height: 15px;
+	background-position: -60px -87px;
+}
+
 
 .ic-mask:hover{
 	background-color:red;
 }
+.expand{
+	font-size: 12px;
+	color:#999;
+	display:none;
 
+}
+
+.with-expansion .expand {
+	display:inline-block;
+}
+
+.stats-wide{
+	font-size: 10px;
+	color:#999;
+	text-transform: uppercase;
+	display:none;
+}
+.expanded .stats-wide {
+	display: inline-block;
+	
+}
 
 
 /*animations*/

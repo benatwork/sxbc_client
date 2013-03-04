@@ -14,12 +14,15 @@
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
+
+
     </head>
     <body>
         <div id='center-wrapper'>
             <div id='form-wrapper'>
                 <textarea rows="10" cols="30" id='message-input'></textarea> 
                 <input type="button" name="submit" id='message-submit' value='submit'>
+                <input type="button" name="next" id='next' value='next'>
             </div>
             <div class='feed-wrapper'>
                 <ul class='feed'>
@@ -27,7 +30,6 @@
             </div>
         </div>
 
-       
         <script id="entry-template" type="text/x-handlebars-template">
             <li class="new-li tweet">
                 <time pubdate class='date-time'>{{dateTime}}</time>
@@ -67,8 +69,8 @@
                     <span class='stats-wide'>
                         <b>.</b>
                         <span class='stats'>
-                            <span class='stats-retweets'><strong>3</strong> retweets</span>
-                            <span class='stats-favorites'><strong>1</strong> favorite</span>
+                            <span class='stats-retweets'><strong>{{retweetCount}}</strong> retweets</span>
+                            <!--<span class='stats-favorites'><strong>{{favoriteCount}}</strong> favorite</span>-->
                         </span>
                     </span>
                 </div>

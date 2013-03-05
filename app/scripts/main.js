@@ -10,47 +10,59 @@ var serverUri = "http://sxbc.herokuapp.com";
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
+
+
+
 $(document).ready(function() {
-
-	//http://sxbc.herokuapp.com
-	$("body").append('<script src="http://'+serverUri+'/socket.io/socket.io.js"></script>');
-
-
 	var inputField = $('#message-input');
 	var notifications = $('#notifications');
 
-	$('#message-submit').click(function () {
-		$.ajax({
-			url:serverUri,
-			type:'POST',
-			dataType:'json',
-			data:{"message":inputField.val()},
-			success:function(data){
-				console.log('success',data);
-			},
-			error:function(error){
-				console.log('error fetching tweets: ',error);
-				notifications.text(JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
-			}
-		});
-		inputField.val('');
+
+	// wait to get socket.io.js before initting
+	$.getScript(serverUri+'/socket.io/socket.io.js',function(){
+		init();
+	}).fail(function(jqxhr, settings, exception) {
+		console.log('error getting socket.io.js from the server');
 	});
 
-	$('#next').click(function () {
+	function init(){
+		$('#message-submit').click(function () {
+			notifications.text('');
+			$.ajax({
+				url:serverUri,
+				type:'POST',
+				dataType:'json',
+				data:{"message":inputField.val()},
+				success:function(data){
+					console.log('success',data);
+				},
+				error:function(error){
+					console.log('error fetching tweets: ',error);
+					notifications.text(JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
+				}
+			});
+			inputField.val('');
+
+		});
+
+		$('#next').click(function () {
+			loadTweets();
+		});
+
+		//init websocket which will listen for and trigger a render of any new tweets
+		var socket = io.connect(serverUri,{
+			port:''
+		});
+		
+		socket.on('connect', function () {
+			console.log('websocket connected');
+			socket.on('tweet',function(tweetData){
+				addTweet(tweetData);
+				io.sockets.emit ('messageSuccess', tweetData);
+			});
+		});
 		loadTweets();
-	});
-
-
-
-
-	//init websocket which will listen for and trigger a render of any new tweets
-	if(!io) notifications.text('error connecting to the server');
-	var socket = io.connect(serverUri);
-	socket.on('connect', function () {
-		socket.on('tweet',function(tweetData){
-			addTweet(tweetData);
-		});
-	});
+	}
 
 	function loadTweets(){
 		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
@@ -85,7 +97,7 @@ $(document).ready(function() {
 		cursor = decStrNum(data[data.length-1].id_str);
 	}
 
-	loadTweets();
+
 
 	function decStrNum(n) {
 	    n = n.toString();

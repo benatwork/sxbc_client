@@ -5,17 +5,23 @@
 
 var count = 2;
 var cursor;
-var serverUri = "http://localhost:5000";
+//var serverUri = "http://localhost:5000";
+var serverUri = "http://sxbc.herokuapp.com";
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
 $(document).ready(function() {
+
+	//http://sxbc.herokuapp.com
+	$("body").append('<script src="http://'+serverUri+'/socket.io/socket.io.js"></script>');
+
+
 	var inputField = $('#message-input');
 	var notifications = $('#notifications');
 
 	$('#message-submit').click(function () {
 		$.ajax({
-			url:'http://localhost:5000',
+			url:serverUri,
 			type:'POST',
 			dataType:'json',
 			data:{"message":inputField.val()},
@@ -23,7 +29,7 @@ $(document).ready(function() {
 				console.log('success',data);
 			},
 			error:function(error){
-				console.log('error fetching tweets: ',JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
+				console.log('error fetching tweets: ',error);
 				notifications.text(JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
 			}
 		});
@@ -38,6 +44,7 @@ $(document).ready(function() {
 
 
 	//init websocket which will listen for and trigger a render of any new tweets
+	if(!io) notifications.text('error connecting to the server');
 	var socket = io.connect(serverUri);
 	socket.on('connect', function () {
 		socket.on('tweet',function(tweetData){

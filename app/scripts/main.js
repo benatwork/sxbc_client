@@ -3,10 +3,10 @@
 /*global Handlebars:false */
 /*global io:false */
 
-var count = 2;
+var count = 4;
 var cursor;
-//var serverUri = "http://localhost:5000";
-var serverUri = "http://sxbc.herokuapp.com";
+var serverUri = "http://localhost:5000";
+//var serverUri = "http://sxbc.herokuapp.com";
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
@@ -20,9 +20,7 @@ $(document).ready(function() {
 
 	// wait to get socket.io.js before initting
 	$.getScript(serverUri+'/socket.io/socket.io.js',function(){
-		init();
-	}).fail(function(jqxhr, settings, exception) {
-		console.log('error getting socket.io.js from the server');
+		initWebsockets();
 	});
 
 	function init(){
@@ -42,18 +40,20 @@ $(document).ready(function() {
 				}
 			});
 			inputField.val('');
-
 		});
 
-		$('#next').click(function () {
+		$('.feed-footer').click(function () {
 			loadTweets();
 		});
-
 		//init websocket which will listen for and trigger a render of any new tweets
+		loadTweets();
+	}
+
+	function initWebsockets(){
 		var socket = io.connect(serverUri,{
-			port:''
+			port:5000
 		});
-		
+
 		socket.on('connect', function () {
 			console.log('websocket connected');
 			socket.on('tweet',function(tweetData){
@@ -61,11 +61,20 @@ $(document).ready(function() {
 				io.sockets.emit ('messageSuccess', tweetData);
 			});
 		});
-		loadTweets();
 	}
 
 	function loadTweets(){
 		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
+		function showLoader(){
+			$('.footer-more').fadeIn('fast');
+			$('.footer-loading').fadeOut('fast');
+		}
+		function hideLoader(){
+			$('.footer-more').fadeOut('fast');
+			$('.footer-loading').fadeIn('fast');
+		}
+
+		hideLoader();
 		var requestString = serverUri+'/tweets/'+count;
 		if(cursor) {
 			requestString += '/'+cursor;
@@ -76,28 +85,25 @@ $(document).ready(function() {
 			dataType:"json",
 			success:function(data){
 				processTweets(data);
+				showLoader();
 			},
 			error:function(error){
 				console.log('error fetching tweets: ',error);
 				notifications.text(error.responseText);
 			}
 		});
-	}
+		function processTweets(data){
+			console.log(data);
+			for (var i = 0; i <= data.length-1; i ++) {
+				var result = data[i];
+				console.log(result.id_str);
+				addTweet(result,true);
+			}
 
-
-	function processTweets(data){
-		console.log(data);
-		for (var i = 0; i <= data.length-1; i ++) {
-			var result = data[i];
-			console.log(result.id_str);
-			addTweet(result,true);
+			//set the cursor the id of the last tweet fetched
+			cursor = decStrNum(data[data.length-1].id_str);
 		}
-		//set the cursor the id of the last tweet fetched
-
-		cursor = decStrNum(data[data.length-1].id_str);
 	}
-
-
 
 	function decStrNum(n) {
 	    n = n.toString();
@@ -132,7 +138,8 @@ $(document).ready(function() {
 		var newLi = $.parseHTML(template(context));
 		var $newLi = $(newLi);
 		if(fromBottom){
-			$newLi.appendTo($('.feed'));
+			//add li elements before the list footer
+			$('.feed li').last().before($newLi);
 		} else {
 			$newLi.prependTo($('.feed'));
 		}
@@ -195,6 +202,7 @@ $(document).ready(function() {
 	    }
 	};
 
+	init();
 });
 
 

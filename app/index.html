@@ -23,6 +23,7 @@
                 <textarea rows="10" cols="30" id='message-input'></textarea> 
                 <input type="button" name="submit" id='message-submit' value='submit'>
                 <input type="button" name="next" id='next' value='next'>
+                <span id='notifications'></span>
             </div>
             <div class='feed-wrapper'>
                 <ul class='feed'>
@@ -89,7 +90,10 @@
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
 
+        <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+
         <!-- build:js scripts/main.js -->
+
         <script src="components/jquery/jquery.js"></script>
         <script src="components/handlebars/handlebars.js"></script>
         <script src="scripts/main.js"></script>

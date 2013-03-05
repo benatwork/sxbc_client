@@ -1,27 +1,53 @@
 
 /*global $:false */
 /*global Handlebars:false */
+/*global io:false */
 
 var count = 2;
 var cursor;
+var serverUri = "http://localhost:5000";
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
 $(document).ready(function() {
 	var inputField = $('#message-input');
+	var notifications = $('#notifications');
 
 	$('#message-submit').click(function () {
-		var message = {text:inputField.val()};
-		addTweet(message);
+		$.ajax({
+			url:'http://localhost:5000',
+			type:'POST',
+			dataType:'json',
+			data:{"message":inputField.val()},
+			success:function(data){
+				console.log('success',data);
+			},
+			error:function(error){
+				console.log('error fetching tweets: ',JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
+				notifications.text(JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
+			}
+		});
 		inputField.val('');
 	});
+
 	$('#next').click(function () {
 		loadTweets();
 	});
 
+
+
+
+	//init websocket which will listen for and trigger a render of any new tweets
+	var socket = io.connect(serverUri);
+	socket.on('connect', function () {
+		socket.on('tweet',function(tweetData){
+			addTweet(tweetData);
+		});
+	});
+
 	function loadTweets(){
 		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
-		var requestString = 'http://localhost:3001/tweets/'+count;
+		var requestString = serverUri+'/tweets/'+count;
 		if(cursor) {
 			requestString += '/'+cursor;
 		}
@@ -34,16 +60,18 @@ $(document).ready(function() {
 			},
 			error:function(error){
 				console.log('error fetching tweets: ',error);
+				notifications.text(error.responseText);
 			}
 		});
 	}
+
 
 	function processTweets(data){
 		console.log(data);
 		for (var i = 0; i <= data.length-1; i ++) {
 			var result = data[i];
 			console.log(result.id_str);
-			addTweet(result,false);
+			addTweet(result,true);
 		}
 		//set the cursor the id of the last tweet fetched
 
@@ -51,8 +79,6 @@ $(document).ready(function() {
 	}
 
 	loadTweets();
-
-
 
 	function decStrNum(n) {
 	    n = n.toString();
@@ -70,7 +96,7 @@ $(document).ready(function() {
 	    return result;
 	}
 
-	function addTweet(tweet){
+	function addTweet(tweet,fromBottom){
 		var source   = $('#entry-template').html();
 		var template = Handlebars.compile(source);
 		var date = new Date(tweet.created_at);
@@ -86,7 +112,11 @@ $(document).ready(function() {
 		};
 		var newLi = $.parseHTML(template(context));
 		var $newLi = $(newLi);
-		$newLi.appendTo($('.feed'));
+		if(fromBottom){
+			$newLi.appendTo($('.feed'));
+		} else {
+			$newLi.prependTo($('.feed'));
+		}
 		$newLi.addClass('with-expansion');
 		$newLi.hover(function(){
 			$('.tweet-actions',this).fadeIn('fast');

@@ -1,4 +1,5 @@
-$accentColor:red;
+$accentColor:#f47d42;
+$columnWidth:525px;
 
 #html,body{
 	margin:0;
@@ -12,29 +13,53 @@ $accentColor:red;
 }
 a{
 	text-decoration: none;
+	color:$accentColor;
+}
+a:hover{
+	color:$accentColor;
+	text-decoration:underline;
 }
 strong{
 	color:black;
 }
+
 #center-wrapper{
 	margin-left:auto;
 	margin-right:auto;
 	width:100%;
 	/*ipad portrait*/
-	max-width: 768px;
+	max-width: $columnWidth;
 	/*iphone landscape*/
 	/*max-width: 480px;*/
 	height:100%;
 	position:relative;
+	.feed-wrapper{
+		z-index: 99;
+		border: solid 1px black;
+	}
+	.feed{
+		padding:0;
+		margin: 0;
+	}
+
 }
-.feed-wrapper{
-	z-index: 99;
-	border: solid 1px black;
+.header-image{
+
+	color:white;
+	font-size:60px;
+	font-weight:bold;
+	//sheight:200px;
+	text-align:center;
+	img{
+		width:100%;
+	}
 }
-.feed{
-	padding:0;
-	margin: 0;
+.header-subtitle{
+	padding:5px 0 20px 0;
+	color:white;
+	font-size:14px;
 }
+
 .feed li.tweet{
 	z-index: 0;
 	list-style: none;
@@ -46,6 +71,84 @@ strong{
 	background-color: white;
 	word-break: break-word;
 	padding: 12px 12px 10px 69px;
+
+	.header{
+		position:relative;
+	}
+	.avatar{
+		position: absolute;
+		top: 0;
+		left: -57px;
+		width: 48px;
+		height: 48px;
+		background: #fff;
+		border-radius: 4px;
+	}
+
+	.full-name{
+		color:#333;
+		font-weight: bold;
+		font-size: 14px;
+	}
+	.full-name:hover{
+		text-decoration: underline;
+	}
+	.nickname{
+		font-size: 12px;
+		color:#999;
+	}
+	.content{
+		font-size: 14px
+	}
+	.date-time{
+		position: relative;
+		z-index: 50;
+		float: right;
+		margin-top: 2px;
+		font-size: 12px;
+		color:#999;
+	}
+
+	.detail-expander{
+		font-size: 12px
+	}
+	.detail-content{
+		font-size: 12px
+	}
+
+	.footer{
+		min-height: 16px;
+		margin-top: 2px;
+
+		overflow: hidden;
+		border-top: 1px solid transparent;
+
+	}
+
+	.expanded.footer{
+		padding-top: 10px;
+		margin-top: 10px;
+		border-color: #e8e8e8;
+		border-color: rgba(0,0,0,0.1);
+	}
+	.tweet-actions{
+		position: absolute;
+		right: 10px;
+		/*bottom: 0;*/
+		background: #fff;
+		list-style: none;
+		display:none;	
+
+	}
+
+	.tweet-actions li{
+		float:left;
+	}
+
+	.tweet-actions a i{
+		margin: 1px 0 0 8px;
+		overflow: hidden;
+	}
 }
 
 .feed li.tweet:hover{
@@ -113,82 +216,40 @@ strong{
 	}
 }
 
-.header{
-	position:relative;
+.action-bar{
+	padding:5px 0;
+	width:100%;
+	height:30px;
+	background-color:black;
 }
-.avatar{
-	position: absolute;
-	top: 0;
-	left: -57px;
-	width: 48px;
-	height: 48px;
-	background: #fff;
-	border-radius: 4px;
-}
-
-.full-name{
-	color:#333;
-	font-weight: bold;
-	font-size: 14px;
-}
-.full-name:hover{
-	text-decoration: underline;
-}
-.nickname{
-	font-size: 12px;
-	color:#999;
-}
-.content{
-	font-size: 14px
-}
-.date-time{
-	position: relative;
-	z-index: 50;
+#message-submit{
 	float: right;
-	margin-top: 2px;
-	font-size: 12px;
-	color:#999;
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:3px;
+	border:1px solid #adadad;
+	display:inline-block;
+	color:#9c9c9c;
+	font-family:'Helvetica Neue', Arial, Helvetica, sans-serif, Helvetica, Arial, sans-serif;
+	font-size:14px;
+	padding:5px 12px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #f0f0f0;
+	margin: 0px 0 8px 0; 
+	font-weight:bold;
+	width:79px;
+	height:29px;
 }
 
-.detail-expander{
-	font-size: 12px
-}
-.detail-content{
-	font-size: 12px
-}
-
-.footer{
-	min-height: 16px;
-	margin-top: 2px;
-
-	overflow: hidden;
-	border-top: 1px solid transparent;
-
-}
-
-.expanded.footer{
-	padding-top: 10px;
-	margin-top: 10px;
-	border-color: #e8e8e8;
-	border-color: rgba(0,0,0,0.1);
-}
-.tweet-actions{
-	position: absolute;
-	right: 10px;
-	/*bottom: 0;*/
-	background: #fff;
-	list-style: none;
-	display:none;	
-
-}
-
-.tweet-actions li{
-	float:left;
-}
-
-.tweet-actions a i{
-	margin: 1px 0 0 8px;
-	overflow: hidden;
+#message-submit:hover{
+	color:$accentColor;
 }
 
 .ic-mask{
@@ -242,6 +303,7 @@ strong{
 }
 #notifications{
 	color:white;
+	padding:0 5px;
 }
 .error{
 	color:$accentColor;

@@ -14,16 +14,25 @@
         <!-- build:js scripts/vendor/modernizr.js -->
         <script src="components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
-
-
     </head>
+
     <body>
+
         <div id='center-wrapper'>
+            <div class='header-image'>
+                <img src='images/sxbc_header.jpg' />
+            </div>
+            <div class='header-subtitle'>
+                Send anonymous tweets you wouldn't dare to from your own account.
+            </div>
             <div id='form-wrapper'>
                 <textarea rows="10" cols="30" id='message-input'></textarea> 
-                <input type="button" name="submit" id='message-submit' value='submit'>
-                
-                <span id='notifications'></span>
+                <div class='action-bar'>
+                    <a href="https://twitter.com/SXBackChannel" class="twitter-follow-button" data-show-count="false" data-size="large" data-show-screen-name="false"></a>
+                    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                    <input type="submit" name="submit" id='message-submit' value='Tweet'>
+                    <span id='notifications'></span>
+                </div>
             </div>
             <div class='feed-wrapper'>
                 <ul class='feed'>

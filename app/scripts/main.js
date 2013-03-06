@@ -4,35 +4,47 @@
 /*global io:false */
 
 
-var dev = false;
+//_______________________ config _______________________________
+// true to use localhost, false for heroku server
+var dev = true;
 
-var count = 10;
+//how many tweets to fetch at a time
+var count = 30;
+
+//user name of twitter account to fetch
+var accountToFetch = 'sxbackchannel';
+
 var cursor;
-var serverUri;
 
+var serverUri;
 if(dev){
+	//dev settings
 	serverUri = "http://localhost:5000";
 	console.warn('using development server');
 } else {
+	//production settings
 	serverUri = "http://sxbc.herokuapp.com";
 	console.warn('using production server');
 }
-//var serverUri = "http://localhost:5000";
-
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
+
+
+
 
 $(document).ready(function() {
 	var inputField = $('#message-input');
 	var notifications = $('#notifications');
 
-
-	// wait to get socket.io.js before initting
+	//init websockets after js has been loaded from server
 	$.getScript(serverUri+'/socket.io/socket.io.js',function(){
 		initWebsockets();
 	});
 
+	init();
+
+	//init
 	function init(){
 		$('#message-submit').click(function () {
 			notifications.text('');
@@ -52,11 +64,23 @@ $(document).ready(function() {
 			inputField.val('');
 		});
 
+		//catch enter press
+		inputField.keyup(function(event){
+		    if(event.keyCode === 13){
+		        $('#message-submit').click();
+		    }
+		});
+
+		//set focus to textinput
+		inputField.focus();
+
+		//load more tweets on footer click
 		$('.feed-footer').click(function () {
 			loadTweets();
 		});
-		//init websocket which will listen for and trigger a render of any new tweets
-		loadTweets();
+
+		//initial load
+		loadTweets(30);
 	}
 
 	function initWebsockets(){
@@ -72,26 +96,20 @@ $(document).ready(function() {
 		});
 	}
 
-	function loadTweets(){
+	function loadTweets(overrideCount){
 		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
-		function showLoader(){
-			$('.footer-more').fadeIn('fast');
-			$('.footer-loading').fadeOut('fast');
-		}
-		function hideLoader(){
-			$('.footer-more').fadeOut('fast');
-			$('.footer-loading').fadeIn('fast');
-		}
+		var _count = overrideCount || count;
 
 		hideLoader();
-		var requestString = serverUri+'/tweets/'+count;
-		if(cursor) {
-			requestString += '/'+cursor;
-		}
 
 		$.ajax({
-			url:requestString,
+			url:serverUri+'/get_tweets',
 			dataType:"json",
+			headers: {
+				'x-name': accountToFetch,
+				'x-count': _count,
+				'x-cursor': cursor
+			},
 			success:function(data){
 				processTweets(data);
 				showLoader();
@@ -101,34 +119,30 @@ $(document).ready(function() {
 				notifications.text(error.responseText);
 			}
 		});
+
 		function processTweets(data){
-			console.log(data);
 			for (var i = 0; i <= data.length-1; i ++) {
 				var result = data[i];
-				
 				addTweet(result,true);
 			}
 
-			//set the cursor the id of the last tweet fetched
-			cursor = decStrNum(data[data.length-1].id_str);
+			if(data.length < _count) {
+				$('.feed-footer').remove();
+			} else {
+				//set the cursor the id of the last tweet fetched
+				cursor = decStrNum(data[data.length-1].id_str);
+			}
+		}
+		function showLoader(){
+			$('.footer-more').fadeIn('fast');
+			$('.footer-loading').fadeOut('fast');
+		}
+		function hideLoader(){
+			$('.footer-more').fadeOut('fast');
+			$('.footer-loading').fadeIn('fast');
 		}
 	}
 
-	function decStrNum(n) {
-	    n = n.toString();
-	    var result=n;
-	    var i=n.length-1;
-	    while (i>-1) {
-			if (n[i]==="0") {
-				result=result.substring(0,i)+"9"+result.substring(i+1);
-				i --;
-			} else {
-				result=result.substring(0,i)+(parseInt(n[i],10)-1).toString()+result.substring(i+1);
-				return result;
-			}
-		}
-	    return result;
-	}
 
 	function addTweet(tweet,fromBottom){
 		var source   = $('#entry-template').html();
@@ -144,8 +158,12 @@ $(document).ready(function() {
 			favoriteCount:tweet.favourites_count,
 			retweetCount:tweet.retweet_count
 		};
+
+		//render template
 		var newLi = $.parseHTML(template(context));
 		var $newLi = $(newLi);
+
+
 		if(fromBottom){
 			//add li elements before the list footer
 			$newLi.addClass('bottom');
@@ -153,67 +171,85 @@ $(document).ready(function() {
 		} else {
 			$newLi.prependTo($('.feed'));
 		}
+
+		//if there are retweets, enable the expandable area
 		if(tweet.retweet_count > 0) {
 			$newLi.addClass('with-expansion');
+			$newLi.click(function(){
+				if($('.footer',this).hasClass('expanded')){
+					$('.footer',this).removeClass('expanded');
+					$('.expand',this).text('expand');
+				} else {
+					$('.footer',this).addClass('expanded');
+					$('.expand',this).text('collapse');
+				}
+			});
 		}
+
+		//show action buttons on hover
 		$newLi.hover(function(){
 			$('.tweet-actions',this).fadeIn('fast');
 		},function(){
 			$('.tweet-actions',this).fadeOut('fast');
 		});
-		$newLi.click(function(){
-			if($('.footer',this).hasClass('expanded')){
-				$('.footer',this).removeClass('expanded');
-				$('.expand',this).text('expand');
-			} else {
-				$('.footer',this).addClass('expanded');
-				$('.expand',this).text('collapse');
-			}
-		});
 
+		//remove the new-li class to trigger the animation back to final position
 		setTimeout(function () {
 			$newLi.removeClass('new-li');
 		},0);
 	}
 
-	/**
-	  * The Twitalinkahashifyer!
-	  * http://www.dustindiaz.com/basement/ify.html
-	  * Eg:
-	  * ify.clean('your tweet text');
-	  */
-	var ify = {
-	    link: function (tweet) {
-	        return tweet.replace(/\b(((https*\:\/\/)|www\.)[^\"\']+?)(([!?,.\)]+)?(\s|$))/g, function (link, m1, m2, m3, m4) {
-	            var http = m2.match(/w/) ? 'http://' : '';
-	            return '<a class="twtr-hyperlink" target="_blank" href="' + http + m1 + '">' + ((m1.length > 25) ? m1.substr(0, 24) + '...' : m1) + '</a>' + m4;
-	        });
-	    },
-
-	    at: function (tweet) {
-	        return tweet.replace(/\B[@＠]([a-zA-Z0-9_]{1,20})/g, function (m, username) {
-	            return '<a target="_blank" class="twtr-atreply" href="http://twitter.com/intent/user?screen_name=' + username + '">@' + username + '</a>';
-	        });
-	    },
-
-	    list: function (tweet) {
-	        return tweet.replace(/\B[@＠]([a-zA-Z0-9_]{1,20}\/\w+)/g, function (m, userlist) {
-	            return '<a target="_blank" class="twtr-atreply" href="http://twitter.com/' + userlist + '">@' + userlist + '</a>';
-	        });
-	    },
-
-	    hash: function (tweet) {
-	        return tweet.replace(/(^|\s+)#(\w+)/gi, function (m, before, hash) {
-	            return before + '<a target="_blank" class="twtr-hashtag" href="http://twitter.com/search?q=%23' + hash + '">#' + hash + '</a>';
-	        });
-	    },
-
-	    clean: function (tweet) {
-	        return this.hash(this.at(this.list(this.link(tweet))));
-	    }
-	};
-
-	init();
+	
 });
+
+
+//__________________________ utils ___________________________________________________
+
+function decStrNum(n) {
+    n = n.toString();
+    var result=n;
+    var i=n.length-1;
+    while (i>-1) {
+		if (n[i]==="0") {
+			result=result.substring(0,i)+"9"+result.substring(i+1);
+			i --;
+		} else {
+			result=result.substring(0,i)+(parseInt(n[i],10)-1).toString()+result.substring(i+1);
+			return result;
+		}
+	}
+    return result;
+}
+
+var ify = {
+    link: function (tweet) {
+        return tweet.replace(/\b(((https*\:\/\/)|www\.)[^\"\']+?)(([!?,.\)]+)?(\s|$))/g, function (link, m1, m2, m3, m4) {
+            var http = m2.match(/w/) ? 'http://' : '';
+            return '<a class="twtr-hyperlink" target="_blank" href="' + http + m1 + '">' + ((m1.length > 25) ? m1.substr(0, 24) + '...' : m1) + '</a>' + m4;
+        });
+    },
+
+    at: function (tweet) {
+        return tweet.replace(/\B[@＠]([a-zA-Z0-9_]{1,20})/g, function (m, username) {
+            return '<a target="_blank" class="twtr-atreply" href="http://twitter.com/intent/user?screen_name=' + username + '">@' + username + '</a>';
+        });
+    },
+
+    list: function (tweet) {
+        return tweet.replace(/\B[@＠]([a-zA-Z0-9_]{1,20}\/\w+)/g, function (m, userlist) {
+            return '<a target="_blank" class="twtr-atreply" href="http://twitter.com/' + userlist + '">@' + userlist + '</a>';
+        });
+    },
+
+    hash: function (tweet) {
+        return tweet.replace(/(^|\s+)#(\w+)/gi, function (m, before, hash) {
+            return before + '<a target="_blank" class="twtr-hashtag" href="http://twitter.com/search?q=%23' + hash + '">#' + hash + '</a>';
+        });
+    },
+
+    clean: function (tweet) {
+        return this.hash(this.at(this.list(this.link(tweet))));
+    }
+};
 
 

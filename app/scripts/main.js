@@ -6,10 +6,11 @@
 
 //_______________________ config _______________________________
 // true to use localhost, false for heroku server
-var dev = true;
+var dev = false;
 
 //how many tweets to fetch at a time
 var count = 30;
+var initialLoadCount = 30;
 
 //user name of twitter account to fetch
 var accountToFetch = 'sxbackchannel';
@@ -29,8 +30,6 @@ if(dev){
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
-
-
 
 
 $(document).ready(function() {
@@ -80,39 +79,43 @@ $(document).ready(function() {
 		});
 
 		//initial load
-		loadTweets(30);
+		loadTweets(initialLoadCount);
 	}
 
 	function initWebsockets(){
+		//init connection
 		var socket = io.connect(serverUri,{
 			port:dev ? 5000 : ''
 		});
 
 		socket.on('connect', function () {
 			console.log('websocket connected');
+			//listener for new tweets
 			socket.on('tweet',function(tweetData){
 				addTweet(tweetData);
 			});
 		});
 	}
 
-	function loadTweets(overrideCount){
+	function loadTweets(overrideCount,overrideUser){
 		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
 		var _count = overrideCount || count;
+		var _user = overrideUser || accountToFetch;
 
-		hideLoader();
+
+		showLoader();
 
 		$.ajax({
 			url:serverUri+'/get_tweets',
 			dataType:"json",
 			headers: {
-				'x-name': accountToFetch,
+				'x-name': _user,
 				'x-count': _count,
 				'x-cursor': cursor
 			},
 			success:function(data){
 				processTweets(data);
-				showLoader();
+				hideLoader();
 			},
 			error:function(error){
 				console.log('error fetching tweets: ',error);
@@ -133,11 +136,11 @@ $(document).ready(function() {
 				cursor = decStrNum(data[data.length-1].id_str);
 			}
 		}
-		function showLoader(){
+		function hideLoader(){
 			$('.footer-more').fadeIn('fast');
 			$('.footer-loading').fadeOut('fast');
 		}
-		function hideLoader(){
+		function showLoader(){
 			$('.footer-more').fadeOut('fast');
 			$('.footer-loading').fadeIn('fast');
 		}

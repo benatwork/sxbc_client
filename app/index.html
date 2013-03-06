@@ -23,13 +23,13 @@
                 <img src='images/sxbc_header.jpg' />
             </div>
             <div class='header-subtitle'>
-                Send anonymous tweets you wouldn't dare to from your own account.
+                Anonymously tweet your REAL thoughts on the SXSW people, panels, and parties.
             </div>
             <div id='form-wrapper'>
                 <textarea rows="10" cols="30" id='message-input'></textarea> 
                 <div class='action-bar'>
                     <a href="https://twitter.com/SXBackChannel" class="twitter-follow-button" data-show-count="false" data-size="large" data-show-screen-name="false"></a>
-                    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                   
                     <input type="submit" name="submit" id='message-submit' value='Tweet'>
                     <span id='notifications'></span>
                 </div>
@@ -66,17 +66,17 @@
                 <div class='footer'>
                     <ul class='tweet-actions'>
                         <li>
-                            <a href="https://twitter.com/intent/tweet?in_reply_to=306736863761293312" class="reply-action web-intent" title="Reply">
+                            <a href="https://twitter.com/intent/tweet?in_reply_to={{tweetId}}" class="reply-action web-intent" title="Reply">
                                 <i class="ic-reply ic-mask"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="https://twitter.com/intent/retweet?tweet_id=306871700774088704" class="retweet-action web-intent" title="Retweet">
+                            <a href="https://twitter.com/intent/retweet?tweet_id={{tweetId}}" class="retweet-action web-intent" title="Retweet">
                                 <i class="ic-retweet ic-mask"></i>
                             </a>
                         <li>
                         <li>
-                            <a href="https://twitter.com/intent/favorite?tweet_id=306871700774088704" class="favorite-action web-intent" title="Favorite">
+                            <a href="https://twitter.com/intent/favorite?tweet_id={{tweetId}}" class="favorite-action web-intent" title="Favorite">
                                 <i class="ic-fav ic-mask"></i>
                             </a>
                         </li>   
@@ -111,5 +111,7 @@
         <script src="scripts/main.js"></script>
 
         <!-- endbuild -->
+         
+
 </body>
 </html>

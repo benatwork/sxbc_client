@@ -6,14 +6,22 @@
 
 //_______________________ config _______________________________
 // true to use localhost, false for heroku server
-var dev = false;
+var dev = true;
 
-//how many tweets to fetch at a time
+//how many tweets to fetch on load
+var initialLoadCount = 15;
 var count = 30;
-var initialLoadCount = 30;
+
 
 //user name of twitter account to fetch
-var accountToFetch = 'sxbackchannel';
+
+//list to fetch, use https://dev.twitter.com/console
+//list must belong to same user 'accountToFetch'
+var listToFetch = {
+	user:'sxbackchannel',
+	userId:'1145788693',
+	listSlug:'sxbc'
+};
 
 var cursor;
 
@@ -30,7 +38,15 @@ if(dev){
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
+var hasAt = false;
 
+
+
+var shiftPressed = false;
+
+
+
+//_______________________ app ____________________________________
 
 $(document).ready(function() {
 	var inputField = $('#message-input');
@@ -41,47 +57,32 @@ $(document).ready(function() {
 		initWebsockets();
 	});
 
-	init();
+	//use to force twitter GET limit to be exceeded for testing
+	//breakTwitterRateLimit();
 
-	// setInterval(function(){
-	// 	$.ajax({
-	// 		url:serverUri+'/get_tweets',
-	// 		dataType:"json",
-	// 		headers: {
-	// 			'x-name': 'sxbackchannel',
-	// 			'x-count': 1
-	// 			//'x-cursor': cursor
-	// 		},
-	// 		success:function(){
-	// 			//processTweets(data);
-	// 			//hideLoader();
-	// 			count ++;
-	// 			console.log(count);
-	// 		},
-	// 		error:function(error){
-	// 			console.log('error fetching tweets: ',error);
-	// 			//notifications.text(error.responseText);
-	// 		}
-	// 	});
-	// },10);
+	init();
 
 	//init
 	function init(){
+
+		inputField.keydown(validateText);
+		inputField.keyup(validateText);
+
+		//listen for the shift key
+		$(document).bind('keyup keydown', function(e){
+			shiftPressed = e.shiftKey;
+		} );
+
 		$('#message-submit').click(function () {
 			notifications.text('');
-			$.ajax({
-				url:serverUri,
-				type:'POST',
-				dataType:'json',
-				data:{"message":inputField.val()},
-				success:function(data){
-					console.log('success',data);
-				},
-				error:function(error){
-					console.log('error fetching tweets: ',error);
-					notifications.text(JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message);
-				}
-			});
+
+			//if shift is pressed, pass the id of an alternate twitter account to post from
+			if(shiftPressed){
+				submitMessage(inputField.val(),1);
+			} else {
+				submitMessage(inputField.val());
+			}
+
 			inputField.val('');
 		});
 
@@ -102,6 +103,7 @@ $(document).ready(function() {
 
 		//initial load
 		loadTweets(initialLoadCount);
+		setTimeout(initFollowButton,100);
 	}
 
 	function initWebsockets(){
@@ -109,43 +111,77 @@ $(document).ready(function() {
 		var socket = io.connect(serverUri,{
 			port:dev ? 5000 : ''
 		});
-		//socket.off('connect');
+		socket.removeAllListeners();
 		socket.on('connect', function () {
-			console.log('websocket connected');
 			//listener for new tweets
+			console.log('websocket connected - listening for new tweets');
+			socket.removeListener('tweet');
 			socket.on('tweet',function(tweetData){
 				addTweet(tweetData);
 			});
 		});
 	}
 
-	function loadTweets(overrideCount,overrideUser){
-		//var requestString = 'http://search.twitter.com/search.json?q=from:'+twitter_user+'&rpp='+count+'&callback=?';
-		var _count = overrideCount || count;
-		var _user = overrideUser || accountToFetch;
+	function validateText() {
 
+		var limitCount = 140;
+		var limitField = inputField;
+		//remove any @ signs that are typed
+		if(!hasAt) {clearNotification();}
+		if (limitField.val().match('@')){
+            //limitField.val(limitField.val().replace('@',''));
+            setNotifictation("Warning: @'s will be removed",true);
+        }
+		if (limitField.val().length > limitCount) {
+			limitField.val(limitField.val().substring(0, limitCount));
+			$("#countdown").text(0);
+		} else {
+			$("#countdown").text(limitCount - limitField.val().length);
+		}
+	}
+
+	function submitMessage(message,overrideAccountId){
+		var _accountId = overrideAccountId || 0;
+
+		$.ajax({
+			url:serverUri,
+			type:'POST',
+			dataType:'json',
+			data:{"message":message,'accountId':_accountId},
+			success:function(data){
+				console.log('success',data);
+			},
+			error:function(error){
+				console.log('error fetching tweets: ',error);
+				var parsedErrorMessage = JSON.parse(JSON.parse(error.responseText).error.data).errors[0].message;
+				setNotifictation(parsedErrorMessage,true);
+			}
+		});
+	}
+	function loadTweets(overrideCount){
+		var _count = overrideCount || count;
 
 		showLoader();
 
 		$.ajax({
-			url:serverUri+'/get_tweets',
+			url:serverUri+'/get_list_tweets',
 			dataType:"json",
 			headers: {
-				'x-name': _user,
+				'x-name': listToFetch.user,
 				'x-count': _count,
-				'x-cursor': cursor
+				'x-cursor': cursor,
+				//'x-list-id': listToFetch.listId,
+				'x-list-slug':listToFetch.listSlug
 			},
 			success:function(data){
 				processTweets(data);
-				hideLoader();
 			},
 			error:function(error){
 				if(error.status === 0){
-					notifications.text('Could not connect to the server');
+					setNotifictation('Could not connect to the server',true);
 				} else {
 					console.log('error fetching tweets: ',error);
-					console.log(error);
-					notifications.text(error.statusText);
+					setNotifictation(error.statusText,true);
 				}
 			}
 		});
@@ -162,19 +198,23 @@ $(document).ready(function() {
 				//set the cursor the id of the last tweet fetched
 				cursor = decStrNum(data[data.length-1].id_str);
 			}
+			hideLoader();
 		}
 		function hideLoader(){
-			$('.footer-more').fadeIn('fast');
-			$('.footer-loading').fadeOut('fast');
+			$('.footer-more').fadeIn(0.4);
+			$('.footer-loading').fadeOut(0.4);
 		}
 		function showLoader(){
-			$('.footer-more').fadeOut('fast');
-			$('.footer-loading').fadeIn('fast');
+			$('.footer-more').fadeOut(0.4);
+			$('.footer-loading').fadeIn(0.4);
 		}
+
+
 	}
 
 
 	function addTweet(tweet,fromBottom){
+		
 		var source   = $('#entry-template').html();
 		var template = Handlebars.compile(source);
 		var date = new Date(tweet.created_at);
@@ -184,9 +224,10 @@ $(document).ready(function() {
 			userUrl: 'http://twitter.com/'+tweet.user.screen_name,
 			fullName: tweet.user.name,
 			nickname: '@'+tweet.user.screen_name,
-			dateTime: monthNames[date.getMonth()]+' '+date.getDay(),
+			dateTime: monthNames[date.getMonth()]+' '+date.getDate(),
 			favoriteCount:tweet.favourites_count,
-			retweetCount:tweet.retweet_count
+			retweetCount:tweet.retweet_count,
+			tweetId: tweet.id_str
 		};
 
 		//render template
@@ -201,7 +242,7 @@ $(document).ready(function() {
 		} else {
 			$newLi.prependTo($('.feed'));
 		}
-
+		$('.feed');
 		//if there are retweets, enable the expandable area
 		if(tweet.retweet_count > 0) {
 			$newLi.addClass('with-expansion');
@@ -223,13 +264,39 @@ $(document).ready(function() {
 			$('.tweet-actions',this).fadeOut('fast');
 		});
 
-		//remove the new-li class to trigger the animation back to final position
+		//give the li a chance to render then remove new-li, causing it to move into position
 		setTimeout(function () {
 			$newLi.removeClass('new-li');
 		},0);
 	}
 
-	
+	function setNotifictation(message,isError){
+		notifications.text(message);
+		notifications.removeClass('error-text');
+		if(isError) {
+			notifications.addClass('error-text');
+		}
+	}
+
+	function clearNotification(){
+		notifications.text('');
+		notifications.removeClass('error-text');
+	}
+	function initFollowButton(){
+		//code from twitter
+		(function (d, s, id) {
+		    var js, fjs = d.getElementsByTagName(s)[0];
+		    if (!d.getElementById(id)) {
+		        js = d.createElement(s);
+		        js.id = id;
+		        js.src = "//platform.twitter.com/widgets.js";
+		        fjs.parentNode.insertBefore(js, fjs);
+		    }
+		})(document, "script", "twitter-wjs");
+	}
+
+
+
 });
 
 
@@ -282,4 +349,31 @@ var ify = {
     }
 };
 
+// function breakTwitterRateLimit(){
+// 	var r = window.confirm(":::: break twitter rate limit? ::::");
+// 	if (r){
+// 		setInterval(function(){
+// 			$.ajax({
+// 				url:serverUri+'/get_tweets',
+// 				dataType:"json",
+// 				headers: {
+// 					'x-name': 'sxbackchannel',
+// 					'x-count': 1
+// 					//'x-cursor': cursor
+// 				},
+// 				success:function(){
+// 					//processTweets(data);
+// 					//hideLoader();
+// 					count ++;
+// 					console.log(count);
+// 				},
+// 				error:function(error){
+// 					console.log('error fetching tweets: ',error);
+// 					//notifications.text(error.responseText);
+// 				}
+// 			});
+// 		},10);
+// 	}
+
+// }
 

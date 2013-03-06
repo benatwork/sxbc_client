@@ -3,15 +3,25 @@
 /*global Handlebars:false */
 /*global io:false */
 
+
+var dev = false;
+
 var count = 10;
 var cursor;
-var serverUri = "http://localhost:5000";
-//var serverUri = "http://sxbc.herokuapp.com";
+var serverUri;
+
+if(dev){
+	serverUri = "http://localhost:5000";
+	console.warn('using development server');
+} else {
+	serverUri = "http://sxbc.herokuapp.com";
+	console.warn('using production server');
+}
+//var serverUri = "http://localhost:5000";
+
 
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
-
-
 
 $(document).ready(function() {
 	var inputField = $('#message-input');
@@ -51,7 +61,7 @@ $(document).ready(function() {
 
 	function initWebsockets(){
 		var socket = io.connect(serverUri,{
-			port:5000
+			port:dev ? 5000 : ''
 		});
 
 		socket.on('connect', function () {
@@ -95,7 +105,7 @@ $(document).ready(function() {
 			console.log(data);
 			for (var i = 0; i <= data.length-1; i ++) {
 				var result = data[i];
-				console.log(result.id_str);
+				
 				addTweet(result,true);
 			}
 
@@ -143,7 +153,9 @@ $(document).ready(function() {
 		} else {
 			$newLi.prependTo($('.feed'));
 		}
-		if(tweet.retweet_count > 0) {$newLi.addClass('with-expansion')};
+		if(tweet.retweet_count > 0) {
+			$newLi.addClass('with-expansion');
+		}
 		$newLi.hover(function(){
 			$('.tweet-actions',this).fadeIn('fast');
 		},function(){
@@ -156,7 +168,6 @@ $(document).ready(function() {
 			} else {
 				$('.footer',this).addClass('expanded');
 				$('.expand',this).text('collapse');
-
 			}
 		});
 

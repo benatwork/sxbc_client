@@ -175,16 +175,18 @@ $(document).ready(function() {
 
 
 	function addTweet(tweet,fromBottom){
+		console.log(tweet);
 		var source   = $('#entry-template').html();
 		var template = Handlebars.compile(source);
 		var date = new Date(tweet.created_at);
 		var context = {
+			tweetId: tweet.id_str,
 			message: ify.clean(tweet.text),
 			userImg: tweet.user.profile_image_url,
 			userUrl: 'http://twitter.com/'+tweet.user.screen_name,
 			fullName: tweet.user.name,
 			nickname: '@'+tweet.user.screen_name,
-			dateTime: monthNames[date.getMonth()]+' '+date.getDay(),
+			dateTime: monthNames[date.getMonth()]+' '+date.getDate(),
 			favoriteCount:tweet.favourites_count,
 			retweetCount:tweet.retweet_count
 		};

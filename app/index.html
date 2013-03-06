@@ -48,7 +48,7 @@
 
         <script id="entry-template" type="text/x-handlebars-template">
             <li class="new-li tweet">
-                <time pubdate class='date-time'>{{dateTime}}</time>
+                <div pubdate class='date-time'>{{dateTime}}</div>
                 <div class='header' >
                     <a class='profile' target='_blank' href='{{userUrl}}'>
                         <img class='avatar' src="{{userImg}}" />
@@ -66,17 +66,17 @@
                 <div class='footer'>
                     <ul class='tweet-actions'>
                         <li>
-                            <a href="https://twitter.com/intent/tweet?in_reply_to=306736863761293312" class="reply-action web-intent" title="Reply">
+                            <a href="https://twitter.com/intent/tweet?in_reply_to={{tweetId}}" class="reply-action web-intent" title="Reply">
                                 <i class="ic-reply ic-mask"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="https://twitter.com/intent/retweet?tweet_id=306871700774088704" class="retweet-action web-intent" title="Retweet">
+                            <a href="https://twitter.com/intent/retweet?tweet_id={{tweetId}}" class="retweet-action web-intent" title="Retweet">
                                 <i class="ic-retweet ic-mask"></i>
                             </a>
                         <li>
                         <li>
-                            <a href="https://twitter.com/intent/favorite?tweet_id=306871700774088704" class="favorite-action web-intent" title="Favorite">
+                            <a href="https://twitter.com/intent/favorite?tweet_id={{tweetId}}" class="favorite-action web-intent" title="Favorite">
                                 <i class="ic-fav ic-mask"></i>
                             </a>
                         </li>   

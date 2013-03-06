@@ -55,12 +55,23 @@ strong{
 .feed li.feed-footer{
 	@extend li.tweet;	
 	text-align: center;
-	font-size: 16px;
+	font-size: 18px;
 	cursor: pointer;
 	box-shadow: inset 0px 2px 10px 0px #9e9e9e;
 	color:#9e9e9e;
+	min-height: 40px;
+	//margin-top:20px;
 	.footer-loading{
+		position:relative;
+		top:0px;
+		img{
+			width:2px;
+		}
+	}
+	.footer-more{
 		display: none;
+		position:relative;
+		top:10px;
 	}
 	
 }
@@ -94,6 +105,12 @@ strong{
 	/*height of li element*/
 	margin-top:-75px;
 	background-color: $accentColor !important;
+	&.bottom{
+		margin-top:-30px;
+		background-color:white !important;
+		// margin-bottom:10px;
+		top:0;
+	}
 }
 
 .header{

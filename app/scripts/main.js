@@ -3,7 +3,7 @@
 /*global Handlebars:false */
 /*global io:false */
 
-var count = 4;
+var count = 10;
 var cursor;
 var serverUri = "http://localhost:5000";
 //var serverUri = "http://sxbc.herokuapp.com";
@@ -58,7 +58,6 @@ $(document).ready(function() {
 			console.log('websocket connected');
 			socket.on('tweet',function(tweetData){
 				addTweet(tweetData);
-				io.sockets.emit ('messageSuccess', tweetData);
 			});
 		});
 	}
@@ -139,11 +138,12 @@ $(document).ready(function() {
 		var $newLi = $(newLi);
 		if(fromBottom){
 			//add li elements before the list footer
+			$newLi.addClass('bottom');
 			$('.feed li').last().before($newLi);
 		} else {
 			$newLi.prependTo($('.feed'));
 		}
-		$newLi.addClass('with-expansion');
+		if(tweet.retweet_count > 0) {$newLi.addClass('with-expansion')};
 		$newLi.hover(function(){
 			$('.tweet-actions',this).fadeIn('fast');
 		},function(){

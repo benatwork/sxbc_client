@@ -43,6 +43,28 @@ $(document).ready(function() {
 
 	init();
 
+	// setInterval(function(){
+	// 	$.ajax({
+	// 		url:serverUri+'/get_tweets',
+	// 		dataType:"json",
+	// 		headers: {
+	// 			'x-name': 'sxbackchannel',
+	// 			'x-count': 1
+	// 			//'x-cursor': cursor
+	// 		},
+	// 		success:function(){
+	// 			//processTweets(data);
+	// 			//hideLoader();
+	// 			count ++;
+	// 			console.log(count);
+	// 		},
+	// 		error:function(error){
+	// 			console.log('error fetching tweets: ',error);
+	// 			//notifications.text(error.responseText);
+	// 		}
+	// 	});
+	// },10);
+
 	//init
 	function init(){
 		$('#message-submit').click(function () {
@@ -87,7 +109,7 @@ $(document).ready(function() {
 		var socket = io.connect(serverUri,{
 			port:dev ? 5000 : ''
 		});
-
+		//socket.off('connect');
 		socket.on('connect', function () {
 			console.log('websocket connected');
 			//listener for new tweets
@@ -118,8 +140,13 @@ $(document).ready(function() {
 				hideLoader();
 			},
 			error:function(error){
-				console.log('error fetching tweets: ',error);
-				notifications.text(error.responseText);
+				if(error.status === 0){
+					notifications.text('Could not connect to the server');
+				} else {
+					console.log('error fetching tweets: ',error);
+					console.log(error);
+					notifications.text(error.statusText);
+				}
 			}
 		});
 

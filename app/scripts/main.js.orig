@@ -192,7 +192,7 @@ $(document).ready(function() {
 				addTweet(result,true);
 			}
 
-			if(data.length < count) {
+			if(data.length < _count) {
 				$('.feed-footer').remove();
 			} else {
 				//set the cursor the id of the last tweet fetched
@@ -214,11 +214,16 @@ $(document).ready(function() {
 
 
 	function addTweet(tweet,fromBottom){
+<<<<<<< HEAD
+		console.log(tweet);
+=======
 		
+>>>>>>> b169b03ea2c197ece2cdf98d4f51fa68aef14d47
 		var source   = $('#entry-template').html();
 		var template = Handlebars.compile(source);
 		var date = new Date(tweet.created_at);
 		var context = {
+			tweetId: tweet.id_str,
 			message: ify.clean(tweet.text),
 			userImg: tweet.user.profile_image_url,
 			userUrl: 'http://twitter.com/'+tweet.user.screen_name,

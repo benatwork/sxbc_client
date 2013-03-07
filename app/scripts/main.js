@@ -2,6 +2,7 @@
 /*global $:false */
 /*global Handlebars:false */
 /*global io:false */
+/*global Modernizr:false */
 
 
 //_______________________ config _______________________________
@@ -9,8 +10,8 @@
 var dev = false;
 
 //how many tweets to fetch on load
-var initialLoadCount = 15;
-var count = 35;
+var initialLoadCount = 20;
+var count = 40;
 
 
 //user name of twitter account to fetch
@@ -24,6 +25,8 @@ var listToFetch = {
 };
 
 var cursor;
+var isTouch = Modernizr.touch ? true : false;
+
 
 var serverUri;
 if(dev){
@@ -39,6 +42,7 @@ if(dev){
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June",
     "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
 var hasAt = false;
+var firstLoadComplete = true;
 
 
 
@@ -73,7 +77,14 @@ $(document).ready(function() {
 			shiftPressed = e.shiftKey;
 		} );
 
-		$('#message-submit').click(function () {
+
+		if(isTouch){
+			$('#message-submit').on('touchstart', submitHandler);
+		} else {
+			$('#message-submit').click(submitHandler);
+		}
+
+		function submitHandler(){
 			notifications.text('');
 
 			//if shift is pressed, pass the id of an alternate twitter account to post from
@@ -84,12 +95,12 @@ $(document).ready(function() {
 			}
 
 			inputField.val('');
-		});
+		}
 
 		//catch enter press
 		inputField.keyup(function(event){
 		    if(event.keyCode === 13){
-		        $('#message-submit').click();
+		        submitHandler();
 		    }
 		});
 
@@ -97,9 +108,11 @@ $(document).ready(function() {
 		inputField.focus();
 
 		//load more tweets on footer click
-		$('.feed-footer').click(function () {
-			loadTweets();
-		});
+		if(isTouch){
+			$('.feed-footer').on('touchstart',loadTweets);
+		} else {
+			$('.feed-footer').click(loadTweets);
+		}
 
 		//initial load
 		loadTweets(initialLoadCount);
@@ -195,11 +208,11 @@ $(document).ready(function() {
 				addTweet(result,true);
 			}
 
-			// if(data.length < count) {
-			// 	//$('.feed-footer').remove();
-			// } else {
+			//if(data.length < initialLoadCount) {
+				//$('.feed-footer').remove();
+			//} else {
 				//set the cursor the id of the last tweet fetched
-			cursor = decStrNum(data[data.length-1].id_str);
+				cursor = decStrNum(data[data.length-1].id_str);
 			//}
 			hideLoader();
 		}
@@ -249,17 +262,21 @@ $(document).ready(function() {
 		//if there are retweets, enable the expandable area
 		if(tweet.retweet_count > 0) {
 			$newLi.addClass('with-expansion');
-			$newLi.click(function(){
-				if($('.footer',this).hasClass('expanded')){
-					$('.footer',this).removeClass('expanded');
-					$('.expand',this).text('expand');
-				} else {
-					$('.footer',this).addClass('expanded');
-					$('.expand',this).text('collapse');
-				}
-			});
+			if(isTouch){
+				$newLi.on('touchstart',toggleExpand);
+			} else{
+				$newLi.click(toggleExpand);
+			}
 		}
-
+		function toggleExpand(){
+			if($('.footer',this).hasClass('expanded')){
+				$('.footer',this).removeClass('expanded');
+				$('.expand',this).text('expand');
+			} else {
+				$('.footer',this).addClass('expanded');
+				$('.expand',this).text('collapse');
+			}
+		}
 		//show action buttons on hover
 		$newLi.hover(function(){
 			$('.tweet-actions',this).fadeIn('fast');

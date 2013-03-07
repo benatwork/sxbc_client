@@ -1,4 +1,18 @@
+
+
+
 <!doctype html>
+
+<!--     
+    Created by:
+    @bmorrissey
+    @fouhy
+    @b3nroth 
+-->
+
+
+
+
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -26,12 +40,15 @@
                 Anonymously tweet your REAL thoughts on the SXSW people, panels, and parties.
             </div>
             <div id='form-wrapper'>
-                <textarea rows="10" cols="30" id='message-input'></textarea> 
+                <textarea rows="10" cols="30" id='message-input' ></textarea> 
                 <div class='action-bar'>
                     <a href="https://twitter.com/SXBackChannel" class="twitter-follow-button" data-show-count="false" data-size="large" data-show-screen-name="false"></a>
                    
                     <input type="submit" name="submit" id='message-submit' value='Tweet'>
-                    <span id='notifications'></span>
+                    <div class='notification-container'>
+                        <div id='notifications'></div>
+                        <!-- <div id='notification-loader'><img src='images/ajax-loader.gif'/></div> -->
+                    </div>
                 </div>
             </div>
             <div class='feed-wrapper'>
@@ -97,12 +114,17 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
-            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
+  
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-39117746-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
         </script>
 
         <!-- build:js scripts/script.js -->

@@ -22,6 +22,17 @@ a:hover{
 strong{
 	color:black;
 }
+p {
+	display: block;
+	-webkit-margin-before: 0px;
+	-webkit-margin-after: 2em;
+	-webkit-margin-start: 0px;
+	-webkit-margin-end: 0px;
+}
+textarea {
+    -webkit-appearance: none;
+    border-radius: 0;
+}
 
 #center-wrapper{
 	margin-left:auto;
@@ -178,7 +189,7 @@ strong{
 	.footer-loading{
 		position:absolute;
 		width:100%;
-		top:10px;
+		top:12px;
 		img{
 			width:22px;
 		}

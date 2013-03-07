@@ -6,11 +6,11 @@
 
 //_______________________ config _______________________________
 // true to use localhost, false for heroku server
-var dev = true;
+var dev = false;
 
 //how many tweets to fetch on load
 var initialLoadCount = 15;
-var count = 30;
+var count = 35;
 
 
 //user name of twitter account to fetch
@@ -135,10 +135,13 @@ $(document).ready(function() {
 		if (limitField.val().length > limitCount) {
 			limitField.val(limitField.val().substring(0, limitCount));
 			$("#countdown").text(0);
+			//setNotifictation(0);
 		} else {
-			$("#countdown").text(limitCount - limitField.val().length);
+			//setNotifictation(limitCount - limitField.val().length);
 		}
 	}
+
+
 
 	function submitMessage(message,overrideAccountId){
 		var _accountId = overrideAccountId || 0;
@@ -192,12 +195,12 @@ $(document).ready(function() {
 				addTweet(result,true);
 			}
 
-			if(data.length < count) {
-				$('.feed-footer').remove();
-			} else {
+			// if(data.length < count) {
+			// 	//$('.feed-footer').remove();
+			// } else {
 				//set the cursor the id of the last tweet fetched
-				cursor = decStrNum(data[data.length-1].id_str);
-			}
+			cursor = decStrNum(data[data.length-1].id_str);
+			//}
 			hideLoader();
 		}
 		function hideLoader(){

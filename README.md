@@ -2,4 +2,4 @@ sxbc_client
 ===========
 front end client for www.sxbackchannel.com
 
-connects to node.js server running on heroku via websockets which handles connections to twitter and mongo db.
+fetches and displays tweets from node.js server running on heroku. listens to server via websockets for realtime updates.
